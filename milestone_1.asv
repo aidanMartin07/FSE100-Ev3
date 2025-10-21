@@ -1,28 +1,37 @@
 global key;
 InitKeyboard;
+autonomous = 1;
 
-brick.ResetMotorAngle('AB');
+while autonomous == 1
+    handleKeyBoardInput(brick);
+end
 
-while 1
-    pause(0.1)
+function handleKeyBoardInput(brick)
+    if autonomous == 1
+        switch key
+            case 'q'
+                autonomous = 0
+        end 
+    end
+
     switch key
         case 'uparrow'
             Drive(brick,'AB',0.5, -25,'Coast');
         case 'downarrow'
             Drive(brick,'AB',0.5, 15,'Coast');
         case 'leftarrow'
-            TurnLeft(brick, 40, 85);
+            TurnLeft(brick, 35, 75);
             %disp("LEFT ARROW PRESSED")
         case 'rightarrow'
-            TurnRight(brick, 40, 85);
+            TurnRight(brick, 35, 75);
         case 'w'
             Drive(brick, 'AB', 0.5, -15, 'Coast');
         case 's'
             Drive(brick, 'AB', 0.5,15, 'Coast');
         case 'a'
-            TurnLeft(brick, 40, 50);
+            TurnLeft(brick, 35, 45);
         case 'd'
-            TurnRight(brick,40,50);
+            TurnRight(brick,35,45);
         case 'p'
             MoveLift(brick, 10);
         case 'o'
@@ -30,10 +39,9 @@ while 1
         case 0 
             disp('none pressed');
         case 'q'
-            break;
+            autonomous = 1;
     end
-end
-CloseKeyboard();
+end 
 
 function Drive(brick, motors, time, speed, stop)
     %disp('Function Run')
