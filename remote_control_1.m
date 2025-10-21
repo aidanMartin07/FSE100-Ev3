@@ -1,6 +1,8 @@
 global key;
 InitKeyboard;
 
+brick.ResetMotorAngle('AB');
+
 while 1
     pause(0.1)
     switch key
@@ -9,23 +11,22 @@ while 1
         case 'downarrow'
             Drive(brick,'AB',0.5, 15,'Coast');
         case 'leftarrow'
-            brick.MoveMotorAngleRel('A', 50, 180,'Coast');
-            brick.MoveMotorAngleRel('B', -50, 180, 'Coast');
-            brick.WaitForMotor('A');
-            brick.WaitForMotor('B');
+            TurnLeft(brick, 35, 75);
+            %disp("LEFT ARROW PRESSED")
         case 'rightarrow'
-            brick.MoveMotorAngleRel('A', -50, 180,'Coast');
-            brick.MoveMotorAngleRel('B', 50, 180, 'Coast');
-            brick.WaitForMotor('A');
-            brick.WaitForMotor('B');
+            TurnRight(brick, 35, 75);
+        case 'w'
+            Drive(brick, 'AB', 0.5, -15, 'Coast');
+        case 's'
+            Drive(brick, 'AB', 0.5,15, 'Coast');
+        case 'a'
+            TurnLeft(brick, 35, 45);
+        case 'd'
+            TurnRight(brick,35,45);
         case 'p'
-            brick.MoveMotor('C', 10);
-            pause(0.75);
-            brick.StopMotor('C', 'Coast')
+            MoveLift(brick, 10);
         case 'o'
-            brick.MoveMotor('C', -10);
-            pause(0.75);
-            brick.StopMotor('C','Coast');
+            MoveLift(brick, -10);
         case 0 
             disp('none pressed');
         case 'q'
@@ -39,11 +40,32 @@ function Drive(brick, motors, time, speed, stop)
     brick.MoveMotor(motors, speed);
     pause(time);
     brick.StopMotor(motors, 'Coast');
+    brick.ResetMotorAngle('AB')
 end
 
-function Turn(brick, motors, speed, angle)
-    brick.MoveMotorAngleRel('A', 50, 180,'Coast');
-    brick.MoveMotorAngleRel('B', -50, 180, 'Coast');
+function Turn(brick, speed, angle)
+    brick.MoveMotorAngleAbs('A', 20, -90, 'Brake');
     brick.WaitForMotor('A');
+    brick.ResetMotorAngle('A');
+   % brick.MoveMotorAngleAbs('B', speed, angle, 'Coast');
+   % brick.WaitForMotor('B');
+end
+
+function TurnLeft(brick, speed, angle)
+    brick.MoveMotorAngleAbs('A', speed, angle,'Brake');
+    brick.WaitForMotor('A');
+    brick.ResetMotorAngle('A');
+end
+
+function TurnRight(brick, speed, angle)
+    brick.MoveMotorAngleAbs('B', speed, angle,'Brake');
     brick.WaitForMotor('B');
+    brick.ResetMotorAngle('B');
+end
+
+
+function MoveLift(brick, speed)
+    brick.MoveMotor('C', speed);
+    pause(0.15);
+    brick.StopMotor('C', 'Coast')
 end
