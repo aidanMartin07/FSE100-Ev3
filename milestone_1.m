@@ -2,6 +2,8 @@ global key;
 global mode;
 global go;
 InitKeyboard;
+brick.SetColorMode(1, 4);
+
 
 mode = 1;
 go = 1;
@@ -98,3 +100,8 @@ function MoveLift(brick, speed)
     pause(0.15);
     brick.StopMotor('C', 'Coast')
 end
+
+function current_color, CheckColor(brick)
+    current_color = 0
+    
+end 
