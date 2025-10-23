@@ -12,24 +12,27 @@ while 1
             brick.beep();
             mode = 0; % Exit the loop when 'q' is pressed
             disp(mode)
+        end 
+        if key == 'l'
+            break;
         end
     end 
     while mode == 0
         pause(0.1)
         switch key
             case 'uparrow'
-                Drive(brick,'AB',0.5, -25,'Coast');
+                Drive(brick,'AB',0.5, 25,'Coast');
             case 'downarrow'
-                Drive(brick,'AB',0.5, 15,'Coast');
+                Drive(brick,'AB',0.5, -25,'Coast');
             case 'leftarrow'
                 TurnLeft(brick, 40, 85);
                 %disp("LEFT ARROW PRESSED")
             case 'rightarrow'
                 TurnRight(brick, 40, 85);
             case 'w'
-                Drive(brick, 'AB', 0.5, -15, 'Coast');
+                Drive(brick, 'AB', 0.5, 15, 'Coast');
             case 's'
-                Drive(brick, 'AB', 0.5,15, 'Coast');
+                Drive(brick, 'AB', 0.5,-15, 'Coast');
             case 'a'
                 TurnLeft(brick, 40, 50);
             case 'd'
@@ -42,7 +45,9 @@ while 1
                 disp('none pressed');
             case 'q'
                 brick.beep();
-                mode = 1;
+                mode = 1; %Stop remote control
+            case 'l'
+                break;
         end
     end 
 end

@@ -7,18 +7,18 @@ while 1
     pause(0.1)
     switch key
         case 'uparrow'
-            Drive(brick,'AB',0.5, -25,'Coast');
+            Drive(brick,'AB',0.5, 25,'Coast');
         case 'downarrow'
-            Drive(brick,'AB',0.5, 15,'Coast');
+            Drive(brick,'AB',0.5, -25,'Coast');
         case 'leftarrow'
-            TurnLeft(brick, 40, 85);
+            TurnLeft(brick, 40, 90);
             %disp("LEFT ARROW PRESSED")
         case 'rightarrow'
-            TurnRight(brick, 40, 85);
+            TurnRight(brick, 40, 90);
         case 'w'
-            Drive(brick, 'AB', 0.5, -15, 'Coast');
+            Drive(brick, 'AB', 0.5, 15, 'Coast');
         case 's'
-            Drive(brick, 'AB', 0.5,15, 'Coast');
+            Drive(brick, 'AB', 0.5,-15, 'Coast');
         case 'a'
             TurnLeft(brick, 40, 50);
         case 'd'
