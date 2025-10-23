@@ -1,10 +1,12 @@
 global key;
 global mode;
+global go;
 InitKeyboard;
 
 mode = 1;
+go = 1;
 
-while 1 
+while go 
     while mode
         pause(0.1);
         disp(mode)
@@ -14,6 +16,9 @@ while 1
             disp(mode)
         end 
         if key == 'l'
+            go = 0;
+            brick.beep();
+            disp("Program End");
             break;
         end
     end 
@@ -47,6 +52,9 @@ while 1
                 brick.beep();
                 mode = 1; %Stop remote control
             case 'l'
+                go = 0;
+                brick.beep();
+                disp("Program End");
                 break;
         end
     end 
