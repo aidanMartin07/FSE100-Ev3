@@ -12,6 +12,7 @@ go = 1;
 while go 
     while mode
         pause(0.05);
+        Drive(brick,'AB', 0.5, 25,'Coast');
         [red,green,blue] = GetColorValue(brick);
         found_color = CheckColor(brick, red, green, blue);
         last_color = DoColorAction(brick, found_color, last_color);
@@ -158,6 +159,12 @@ function previous = DoColorAction(brick, current_color,previous_color)
         brick.beep();
         pause(0.2);
         brick.beep();
+    elseif current_color == 4 && previous_color ~= 4
+        mode = ChangeMode(0);
     end
     previous = current_color
 end 
+
+function car_mode = ChangeMode(mode_number)
+    car_mode = mode_number
+end
