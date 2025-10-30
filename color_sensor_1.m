@@ -1,7 +1,8 @@
 brick.SetColorMode(1, 4);
-%color = brick.ColorCode(1);
+%brick.SetColorMode(1, 2)
+%color_code = brick.ColorCode(1);
 
-Drive(brick, 'AB', 0.25, 20, 'Coast')
+%Drive(brick, 'AB', 0.25, 20, 'Coast')
 
 % 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow
 %current_color = 0;
@@ -81,11 +82,12 @@ function [red, green, blue] = CheckColor(brick)
     green = color_rgb(2);
     blue = color_rgb(3);
 
-    if red > 30 && green > 30
+    if red > 30 && green > 30 && blue < 15
         %brick.beep();
         current_color = 4
         disp("Yellow");
-    elseif red > green && red > blue && (blue < 50)
+    elseif red > 30 && green < 15 && blue < 15 && red < 50
+        %red > green && red > blue && (blue < 20) && (green < 30)
         %brick.beep();
         current_color = 1;
         disp("Red");
@@ -98,6 +100,10 @@ function [red, green, blue] = CheckColor(brick)
         %brick.beep();
         current_color = 2;
         disp("Blue");
+    else 
+        brick.beep();
+        current_color = 0;
+        disp("No Color")
     end 
     
     if current_color == 1

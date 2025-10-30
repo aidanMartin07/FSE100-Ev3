@@ -67,7 +67,7 @@ while go
         end
     end 
 end
-
+CloseKeyboard;
 
 
 
