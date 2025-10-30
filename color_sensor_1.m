@@ -4,7 +4,7 @@ brick.SetColorMode(1, 4);
 
 %Drive(brick, 'AB', 0.25, 20, 'Coast')
 
-% 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow
+% 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow, 5 = black ground
 %current_color = 0;
 %color_rgb = brick.ColorRGB(1);
 
@@ -100,10 +100,13 @@ function [red, green, blue] = CheckColor(brick)
         %brick.beep();
         current_color = 2;
         disp("Blue");
+    elseif red < 10 && green < 10 && blue < 10
+        current_color = 5;
+        disp("Black Ground");
     else 
         brick.beep();
         current_color = 0;
-        disp("No Color")
+        disp("No Color");
     end 
     
     if current_color == 1

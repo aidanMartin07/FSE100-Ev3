@@ -2,9 +2,12 @@ global key;
 global mode;
 global go;
 global last_color;
+global state;
+
 InitKeyboard;
 brick.SetColorMode(1, 4);
 
+state = 0; %0 = idle, 1 = moving, 2 = turning
 last_color = 0;
 mode = 1;
 go = 1;
@@ -118,32 +121,36 @@ function [red,green,blue] = GetColorValue(brick)
 end
 
 function [current_color] = CheckColor(brick, red, green, blue)
-    if red > 30 && green > 30
+    current_color = 0;
+    if red > 30 && green > 30 && blue < 15
         %brick.beep();
-        current_color = 4;
+        current_color = 4
         disp("Yellow");
-    elseif red > green && red > blue && (blue < 50)
+    elseif red > 30 && green < 15 && blue < 15 && red < 50
+        %red > green && red > blue && (blue < 20) && (green < 30)
         %brick.beep();
         current_color = 1;
-        %last_color = 1;
         disp("Red");
         disp(current_color);
     elseif green > red && green > blue
         %brick.beep();
         current_color = 3;
-         %last_color = 3;
         disp("Green");
     elseif blue > green && blue> red
         %brick.beep();
         current_color = 2;
-        %last_color = 2;
         disp("Blue");
+    else 
+        brick.beep();
+        current_color = 0;
+        disp("No Color")
     end 
     
 end
 
 function previous = DoColorAction(brick, current_color,previous_color)
     if current_color == 1 && previous_color ~= 1 
+        brick.StopMotor('AB');
         pause(1.0);
     elseif current_color == 2 && previous_color ~= 2
         brick.StopMotor('AB', 'Brake');

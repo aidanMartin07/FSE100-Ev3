@@ -1,6 +1,8 @@
 global key;
 global state;
 
+brick.SetColorMode(1,4);
+
 state = 0; %0 = idle, 1 = moving, 2 = turning
 %Drive(brick,'AB',0.5, 35,'Coast');
 InitKeyboard;
@@ -11,16 +13,16 @@ while 1
     disp(distance)
 
     if distance >40 && state ~= 1
-        state = 1
+        state = 1;
         Drive(brick,'AB',0.5, 35,'Coast');
         %pause(1);
         %waitFor; % Wait for the drive to complete
         state = 0; % Reset state to idle
-    elseif distance < 40 && distance > 30
-        state = 2
+    elseif distance < 40 && distance > 30 && state ~= 2
+        state = 2;
         disp("Turning")
-        TurnLeft(brick, 40, 85);
-        state = 0
+        TurnLeft(brick, 40, 90);
+        state = 0;
     end
 
     if key == 'q'
