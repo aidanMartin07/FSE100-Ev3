@@ -2,39 +2,30 @@ global key;
 global state;
 
 brick.SetColorMode(1,4);
-brick.GyroCalibrate(2);
 
 state = 0; %0 = idle, 1 = moving, 2 = turning
 %Drive(brick,'AB',0.5, 35,'Coast');
 InitKeyboard;
 
 while 1
+    %{
     pause(0.05);
     distance = brick.UltrasonicDist(4);
     disp(distance)
-
-    if distance < 30
-        angle = brick.GyroAngle(2);
-        display(angle)
-
-        TurnRight(brick, 50, 420);
-    elseif distance > 50 
-        break;
-    end
-
+%]
 
     %loop to stay at dist of 30 approx
-    %{
-    if distance >= 30 && distance < 50 && state ~= 1
-        Drive(brick,'AB', 0.5, 15, 'Coast');
-        state = 0;
-    elseif distance >= 20 && distance <= 30 && state ~= 1
-        Drive(brick, 'AB', 0.5, -15, 'Coast');
-        state = 0;
-    elseif distance > 50
-        break;
-    end
-    %}
+    %if distance >= 30 && distance < 50 && state ~= 1
+    %    Drive(brick,'AB', 0.5, 15, 'Coast');
+    %    state = 0;
+    %elseif distance >= 20 && distance <= 30 && state ~= 1
+    %    Drive(brick, 'AB', 0.5, -15, 'Coast');
+    %    state = 0;
+    %elseif distance > 50
+    %    break;
+    %end
+
+
 
     if key == 'q'
         break;
