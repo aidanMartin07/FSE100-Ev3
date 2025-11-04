@@ -1,10 +1,13 @@
 brick.SetColorMode(1, 4);
-%brick.SetColorMode(1, 2)
-%color_code = brick.ColorCode(1);
+brick.ResetMotorAngle('AB');
+global mode;
+last_seen = 0;
+
+mode = 1;
 
 %Drive(brick, 'AB', 0.25, 20, 'Coast')
 
-% 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow
+% 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow, 5 = black ground
 %current_color = 0;
 %color_rgb = brick.ColorRGB(1);
 
@@ -12,28 +15,32 @@ brick.SetColorMode(1, 4);
 %green = color_rgb(2);
 %blue = color_rgb(3);
 
-[red,green,blue] = CheckColor(brick);
+%[red,green,blue] = CheckColor(brick);
 
-fprintf("\tRed: %d\n",  red);
-fprintf("\tGreen: %d\n", green);
-fprintf("\tBlue: %d\n", blue);
+%fprintf("\tRed: %d\n",  red);
+%fprintf("\tGreen: %d\n", green);
+%fprintf("\tBlue: %d\n", blue);
 
+%car loop 
+%car drives and checks color underneath it 
+%stops once car sees color yellow
+while mode
+    %car moves for one second then checks if color has changed
+    %if color is different than last do color action
+    Drive(brick, 'AB', 0.5, 20, 'Coast'); 
+    [red,green,blue] = GetColorValue(brick);
+    found_color = CheckColor(brick, red, green, blue);
+    last_seen = DoColorAction(brick, found_color, last_seen)
+    %if found yellow stop car
+    if found_color == 4
+        display("Yellow Found Stop")
+        brick.beep();
+        mode = 0;
+        break;
+    end
+    %break;
+end 
 
-
-
-%Drive(brick, 'AB',0.3, -15, 'Coast');
-
-%if current_color == 1
-%    Drive(brick, 'AB', 0.3, -15, 'Coast');
-%elseif current_color == 2
-%    TurnLeft(brick, 40, 50);
-%elseif current_color == 3
-%    TurnRight(brick,40, 50);
-%elseif current_color == 4
-%    display("Yellow Found ")
-%    brick.beep();
-%   brick.beep();
-%end
 
 disp("Function Finished")
 
@@ -47,13 +54,6 @@ function Drive(brick, motors, time, speed, stop)
     brick.ResetMotorAngle('AB')
 end
 
-function Turn(brick, speed, angle)
-    brick.MoveMotorAngleAbs('A', 20, -90, 'Brake');
-    brick.WaitForMotor('A');
-    brick.ResetMotorAngle('A');
-   % brick.MoveMotorAngleAbs('B', speed, angle, 'Coast');
-   % brick.WaitForMotor('B');
-end
 
 function TurnLeft(brick, speed, angle)
     brick.MoveMotorAngleAbs('A', speed, angle,'Brake');
@@ -74,15 +74,19 @@ function MoveLift(brick, speed)
     brick.StopMotor('C', 'Coast')
 end
 
-function [red, green, blue] = CheckColor(brick)
+
+function [red,green,blue] = GetColorValue(brick)
     current_color = 0;
     color_rgb = brick.ColorRGB(1);
 
     red = color_rgb(1);
     green = color_rgb(2);
     blue = color_rgb(3);
+end
 
-    if red > 30 && green > 30 
+function [current_color] = CheckColor(brick, red, green, blue)
+    current_color = 0;
+    if red > 30 && green > 30 && blue < 15
         %brick.beep();
         current_color = 4
         disp("Yellow");
@@ -101,27 +105,37 @@ function [red, green, blue] = CheckColor(brick)
         current_color = 2;
         disp("Blue");
     else 
-        brick.beep();
+        %brick.beep();
         current_color = 0;
         disp("No Color")
     end 
     
-    if current_color == 1
-        pause(1.0);
-    elseif current_color == 2
-        brick.StopMotor('AB', 'Brake');
-        pause(0.2);
-        brick.beep();
-        pause(0.2);
-        brick.beep();
-    elseif current_color == 3
-        brick.StopMotor('AB', 'Brake');
-        pause(0.2);
-        brick.beep();
-        pause(0.2);
-        brick.beep();
-        pause(0.2);
-        brick.beep();
-    end
+end
 
+function previous = DoColorAction(brick, current_color,previous_color)
+    if current_color == 1 && previous_color ~= 1 
+        brick.StopMotor('AB');
+        pause(1.0);
+    elseif current_color == 2 && previous_color ~= 2
+        brick.StopMotor('AB', 'Brake');
+        pause(0.2);
+        brick.beep();
+        pause(0.2);
+        brick.beep();
+    elseif current_color == 3 && previous_color ~= 3
+        brick.StopMotor('AB', 'Brake');
+        pause(0.2);
+        brick.beep();
+        pause(0.2);
+        brick.beep();
+        pause(0.2);
+        brick.beep();
+    elseif current_color == 4 && previous_color ~= 4
+        mode = ChangeMode(0);
+    end
+    previous = current_color
+end 
+
+function car_mode = ChangeMode(mode_number)
+    car_mode = mode_number
 end
