@@ -43,12 +43,12 @@ while go
         last_seen = DoColorAction(brick, found_color, last_seen);
         angle = brick.GyroAngle(2);
         distance = brick.UltrasonicDist(4);
-        disp(distance)
-        if distance < 25
-            TurnNinety(brick, 0, 40);
-        else 
-            Drive(brick,'AB', 1, 35, 'Coast');
-        end
+        
+        %{
+            implement maze solving code
+        %}
+        
+
         
         if key == 'q'
             remote = 1;
@@ -84,6 +84,10 @@ while go
                 MoveLift(brick, 10); 
             case 'o'
                 MoveLift(brick, -10)
+            case 'n'
+                TurnNinety(brick, 0, 40);
+            case 'm'
+                TurnNintey(brick, 1 , 40);
             case 'l'
                 remote = 0;
         end
