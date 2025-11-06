@@ -68,7 +68,7 @@ function TurnNinety(brick, dir, speed)
         TurnLeft(brick,25, angleDiff* 4);
         %if angle > -90 && angle < -80
         %    TurnLeft(brick,25,45);
-       % end
+        %end
     end
     disp(angle)
     brick.GyroCalibrate(2);

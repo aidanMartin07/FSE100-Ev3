@@ -2,12 +2,13 @@ brick.SetColorMode(1, 4);
 brick.ResetMotorAngle('AB');
 global mode;
 last_seen = 0;
+% 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow, 5 = black ground
+
 
 mode = 1;
 
 %Drive(brick, 'AB', 0.25, 20, 'Coast')
 
-% 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow, 5 = black ground
 %current_color = 0;
 %color_rgb = brick.ColorRGB(1);
 
@@ -28,9 +29,12 @@ while mode
     %car moves for one second then checks if color has changed
     %if color is different than last do color action
     Drive(brick, 'AB', 0.5, 20, 'Coast'); 
+    
+    %check colors and do color action
     [red,green,blue] = GetColorValue(brick);
     found_color = CheckColor(brick, red, green, blue);
     last_seen = DoColorAction(brick, found_color, last_seen)
+
     %if found yellow stop car
     if found_color == 4
         display("Yellow Found Stop")
@@ -85,23 +89,22 @@ function [red,green,blue] = GetColorValue(brick)
 end
 
 function [current_color] = CheckColor(brick, red, green, blue)
+    %compares color values in vector
+    %determines what color seen
+
     current_color = 0;
     if red > 30 && green > 30 && blue < 15
-        %brick.beep();
         current_color = 4
         disp("Yellow");
     elseif red > 30 && green < 15 && blue < 15 && red < 50
         %red > green && red > blue && (blue < 20) && (green < 30)
-        %brick.beep();
         current_color = 1;
         disp("Red");
         disp(current_color);
     elseif green > red && green > blue
-        %brick.beep();
         current_color = 3;
         disp("Green");
     elseif blue > green && blue> red
-        %brick.beep();
         current_color = 2;
         disp("Blue");
     else 
@@ -118,18 +121,16 @@ function previous = DoColorAction(brick, current_color,previous_color)
         pause(1.0);
     elseif current_color == 2 && previous_color ~= 2
         brick.StopMotor('AB', 'Brake');
-        pause(0.2);
-        brick.beep();
-        pause(0.2);
-        brick.beep();
+        for i = 1:2
+            pause(0.2);
+            brick.beep();
+        end
     elseif current_color == 3 && previous_color ~= 3
         brick.StopMotor('AB', 'Brake');
-        pause(0.2);
-        brick.beep();
-        pause(0.2);
-        brick.beep();
-        pause(0.2);
-        brick.beep();
+        for i = 1:3
+            pause(0.2);
+            brick.beep();
+        end 
     elseif current_color == 4 && previous_color ~= 4
         mode = ChangeMode(0);
     end

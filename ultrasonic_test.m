@@ -3,6 +3,9 @@ global state;
 
 brick.SetColorMode(1,4);
 brick.GyroCalibrate(2);
+angle = brick.GyroAngle(2);
+disp(angle);
+angle = 0
 
 state = 0; %0 = idle, 1 = moving, 2 = turning
 %Drive(brick,'AB',0.5, 35,'Coast');
@@ -62,4 +65,29 @@ function TurnRight(brick, speed, angle)
     brick.MoveMotorAngleAbs('B', speed, angle,'Brake');
     brick.WaitForMotor('B');
     brick.ResetMotorAngle('B');
+end
+
+function TurnNinety(brick, dir, speed)
+    angle = brick.GyroAngle(2);
+    %if angle null change data type to 0 
+    if isnan(angle)
+        angle = 0;
+    end
+    %dir = 0 turn right
+    %dir = 1 turn left
+    %turns just below 90 degrees and does small correction
+    if dir == 0 
+        TurnRight(brick,speed,420);
+        angle = brick.GyroAngle(2);
+        angleDiff = 90 - double(abs(angle));
+        TurnRight(brick,25,angleDiff * 4);
+    else
+        TurnLeft(brick, speed, 420);
+        angle = brick.GyroAngle(2);
+        angleDiff = 90 - double(abs(angle));
+        TurnLeft(brick,25, angleDiff* 4);
+    end
+    disp(angle)
+    %reset gyro rotation
+    brick.GyroCalibrate(2);
 end
