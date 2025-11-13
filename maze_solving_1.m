@@ -11,6 +11,25 @@ global last_seen;
 global go; 
 %determines if should be in remote control
 global remote;
+%stack of actions robot takes and Key locations
+% 0 - Start or yellow
+% 1 - Move Forward
+% 2 - Turn Left
+% 3 - Turn Right
+% 4 - Color Blue
+% 5 - Color Green
+global dir_stack;
+%determines number of times seen specific colors stops looping
+global color_counts;
+%if robot is searching maze or returning 
+%0 - returning
+%1 - searching for blue
+%2 - searching for green
+global searching;
+
+
+
+
 
 InitKeyboard;
 
@@ -26,6 +45,10 @@ state = 0;
 last_seen =0;
 go = 1;
 remote = 0;
+dir_stack = [];
+%first val is for yellow, 2nd for blue, 3rd for green
+color_counts = [1,0,0];
+searching = 1;
 
 brick.beep();
 % main loop once exited car should stop all together
@@ -42,12 +65,26 @@ while go
 
         last_seen = DoColorAction(brick, found_color, last_seen);
         angle = brick.GyroAngle(2);
-        distance = brick.UltrasonicDist(4);
+        distance = brick.UltrasonicDist(3);
         
         %{
             implement maze solving code
+            
+
+
         %}
+        touch = brick.TouchPressed(4);
+        if touch
+            display("touched Reverse and Turn")
+            Drive(brick, 'AB', 1, -30, 'Coast');
+            TurnNinety(brick, 0, 50);
+        else
+            display("no Touch driving forward")
+            Drive(brick, 'AB', 1, 30, 'Coast');
+        end
+    
         
+
 
         
         if key == 'q'
@@ -170,6 +207,9 @@ function [current_color] = CheckColor(brick, red, green, blue)
 end
 
 function previous = DoColorAction(brick, current_color,previous_color)
+    global searching;
+    
+
     if current_color == 1 && previous_color ~= 1 
         brick.StopMotor('AB');
         pause(1.0);
@@ -177,6 +217,7 @@ function previous = DoColorAction(brick, current_color,previous_color)
         brick.StopMotor('AB', 'Brake');
         brick.beep();
         brick.beep();
+        searching = 2;
     elseif current_color == 3 && previous_color ~= 3
         brick.StopMotor('AB', 'Brake');
         Drive(brick, 'AB', 1, 30, 'Coast');
@@ -188,7 +229,8 @@ function previous = DoColorAction(brick, current_color,previous_color)
         MoveLift(brick,-15);
         TurnNinety(brick, 0,50);
         TurnNinety(brick, 0,50);
-    elseif current_color == 4 && previous_color ~= 4
+        searching = 0;
+    elseif current_color == 4 && previous_color ~= 4 && searching == 0
         mode = ChangeMode(0);
     end
     previous = current_color
