@@ -1,4 +1,5 @@
 brick.SetColorMode(1, 4);
+brick.StopMotor('AB', 'Coast');
 %brick.SetColorMode(1, 2)
 %color_code = brick.ColorCode(1);
 

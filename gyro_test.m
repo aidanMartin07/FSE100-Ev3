@@ -7,9 +7,11 @@ angle = brick.GyroAngle(2);
 angle = 0;
 
 while 1
+    angle = brick.GyroAngle(2);
     pause(0.05);
     touch = brick.TouchPressed(4);
-    Drive(brick, 'AB', 1 , 30, 'Coast');
+    %Drive(brick, 'AB', 1 , 30, 'Coast');
+    disp(angle)
     if touch
         brick.beep()
         break;
@@ -17,6 +19,7 @@ while 1
     
 
 end
+
 %{
 TurnLeft(brick, 50, 420);
 angle = brick.GyroAngle(2);
@@ -24,6 +27,8 @@ disp(angle);
 brick.GyroCalibrate(2);
 angle = brick.GyroAngle(2);
 disp(angle);
+
+
 
 
 while angle < 90
