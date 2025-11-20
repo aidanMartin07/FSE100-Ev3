@@ -36,10 +36,10 @@ InitKeyboard;
 %reset car components to default vals
 brick.ResetMotorAngle('ABC');
 brick.SetColorMode(1,4);
-brick.GyroCalibrate(2);
-angle = brick.GyroAngle(2);
-disp(angle);
-angle = 0
+%brick.GyroCalibrate(2);
+%angle = brick.GyroAngle(2);
+%disp(angle);
+%angle = 0
 
 state = 0;
 last_seen =0;
@@ -74,41 +74,41 @@ while go
             break;
         end
         
-
-
-        last_seen = DoColorAction(brick, found_color, last_seen);
         %}
-        angle = brick.GyroAngle(2);
-        distance = brick.UltrasonicDist(3);
+        
+        last_seen = DoColorAction(brick, found_color, last_seen);
+        
+        %angle = brick.GyroAngle(2);
+        distance = brick.UltrasonicDist(2);
         
         %{
             implement maze solving code
         %}
-        touch = brick.TouchPressed(4);
+        touch = brick.TouchPressed(3);
         %if touch sensor activated reverse and turn right
         %otherwise keep moving forward
-        if touch
+        if touch 
             brick.StopMotor('AB', 'Coast');
             disp("touched Reverse and Turn")
-            Drive(brick, 'AB', 1, -30, 'Coast');
-            TurnNinety(brick, 0, 50);
+            Drive(brick, 'AB', 1, -40, 'Coast');
+            TurnNinety(brick, 0, 90);
        % else
-       %     disp("no Touch driving forward")
-       %     Drive(brick, 'AB', 1, 30, 'Coast');
+       %     disp("no Touch driving fzorward")
+       %     Drive(brick, 'AB', 1, 30, 'Coast')z;
         end
 
         %if opening on the left turn left 
         if distance > 50 && turn_counter == 0
             brick.StopMotor('AB', 'Coast');
             disp("Opening on Left turning")
-            Drive(brick,'AB',1,30,'Coast');
+            Drive(brick,'AB',0.5,30,'Coast');
             turn_counter = turn_counter + 1;
             reset_turn = 0;
-            TurnNinety(brick, 1, 50);
+            TurnNinety(brick, 1, 90);
         elseif distance > 70 && turn_counter ~= 0
             disp("Just turned")
             reset_turn = reset_turn +1;
-            if reset_turn >= 8
+            if reset_turn >= 10
                 turn_counter= 0;
             end
         end
@@ -154,7 +154,7 @@ while go
             case 'n'
                 TurnNinety(brick, 0, 40);
             case 'm'
-                TurnNintey(brick, 1 , 40);
+                TurnNinety(brick, 1 , 40);
             case 'l'
                 remote = 0;
             case 'k'
@@ -274,7 +274,7 @@ function previous = DoColorAction(brick, current_color,previous_color)
     end
     previous = current_color;
 end 
-
+%{
 function CenterCar(brick)
     angle = brick.GyroAngle(2);
     if isnan(angle)
@@ -296,34 +296,37 @@ function CenterCar(brick)
        brick.GyroCalibrate(2);
     end
 end
+%}
 
 function TurnNinety(brick, dir, speed)
+%{
     angle = brick.GyroAngle(2);
     if isnan(angle)
         angle = 0;
     end
+%}
     %dir = 0 turn right
     %dir = 1 turn left
     if dir == 0 
-        TurnRight(brick,speed,420);
-        angle = brick.GyroAngle(2);
-        angleDiff = 90 - double(abs(angle));
-        TurnRight(brick,25,angleDiff * 3);
+        TurnRight(brick,speed,460);
+        %angle = brick.GyroAngle(2);
+        %angleDiff = 90 - double(abs(angle));
+        %TurnRight(brick,25,angleDiff * 4);
 
         %if angle < 90 && angle > 80
         %    TurnRight(brick, 25, 45);
         %end
     else
-        TurnLeft(brick, speed, 420);
-        angle = brick.GyroAngle(2);
-        angleDiff = 90 - double(abs(angle));
-        TurnLeft(brick,25, angleDiff* 3);
+        TurnLeft(brick, speed, 520);
+        %angle = brick.GyroAngle(2);
+        %angleDiff = 90 - double(abs(angle));
+        %TurnLeft(brick,25, angleDiff* 4);
         %if angle > -90 && angle < -80
         %    TurnLeft(brick,25,45);
         %end
     end
-    disp(angle)
-    brick.GyroCalibrate(2);
+    %disp(angle)
+    %brick.GyroCalibrate(2);
 end
 
 function car_mode = ChangeMode(mode_number)
