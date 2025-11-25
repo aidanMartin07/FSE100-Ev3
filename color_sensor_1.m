@@ -1,5 +1,5 @@
-brick.SetColorMode(1, 4);
-brick.StopMotor('AB', 'Coast');
+%%brick.SetColorMode(1, 4);
+%brick.StopMotor('AB', 'Coast');
 %brick.SetColorMode(1, 2)
 %color_code = brick.ColorCode(1);
 
@@ -7,18 +7,24 @@ brick.StopMotor('AB', 'Coast');
 
 % 0 = other, 1 = red, 2 = blue, 3 = green, 4 = yellow, 5 = black ground
 %current_color = 0;
-%color_rgb = brick.ColorRGB(1);
+brick.MoveMotor('AB', 30);
 
-%red = color_rgb(1);
-%green = color_rgb(2);
-%blue = color_rgb(3);
+pause(0.5);
+brick.StopMotor('AB', 'Brake');
+%{
+color_rgb = brick.ColorRGB(1);
+
+red = color_rgb(1);
+green = color_rgb(2);
+blue = color_rgb(3);
 
 [red,green,blue] = CheckColor(brick);
 
 fprintf("\tRed: %d\n",  red);
 fprintf("\tGreen: %d\n", green);
 fprintf("\tBlue: %d\n", blue);
-
+%}
+%display(color_rgb)
 
 
 
@@ -82,7 +88,7 @@ function [red, green, blue] = CheckColor(brick)
     red = color_rgb(1);
     green = color_rgb(2);
     blue = color_rgb(3);
-
+    %{
     if red > 30 && green > 30 && blue < 15
         %brick.beep();
         current_color = 4
@@ -108,6 +114,29 @@ function [red, green, blue] = CheckColor(brick)
         brick.beep();
         current_color = 0;
         disp("No Color");
+    end 
+    %}
+    if red > 30 && green > 30 && blue < 15 
+        current_color = 4
+        disp("Yellow");
+    elseif red > 15 && green < 15 && blue < 15 && red < 50
+        %red > green && red > blue && (blue < 20) && (green < 30)
+        current_color = 1;
+        disp("Red");
+        brick.beep()
+        disp(current_color);
+    elseif green > red && green > blue && green >= 15 && color_counts(3)== 0
+        current_color = 3;
+        color_counts(3)= 1;
+        disp("Green");
+    elseif blue > green && blue> red && blue >= 15 && color_counts(2) ==0
+        current_color = 2;
+        color_counts(2) = 1;
+        disp("Blue");
+    else 
+        %brick.beep();
+        current_color = 0;
+        disp("No Color")
     end 
     
     if current_color == 1

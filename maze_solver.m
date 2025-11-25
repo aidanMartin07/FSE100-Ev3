@@ -1,68 +1,38 @@
+global go; % 1 if car loop running
+global remote; %1 if car is remote controlled
 global key;
-%car state 0 = idle, 1 = moving, 2 = turning, 3 = picking up,
-global state; 
-%last color seen 0 = none, 1 = red, 2 = blue, 3 = green 4 = yellow
-%yellow is starting location
-%red is stop for 1 second
-%blue is pickup location switch to remote
-%green is drop off
-global last_seen; 
-%determines if code is beign executed
-global go; 
-%determines if should be in remote control
-global remote;
-%stack of actions robot takes and Key locations
-% 0 - Start or yellow
-% 1 - Move Forward
-% 2 - Turn Left
-% 3 - Turn Right
-% 4 - Color Blue
-% 5 - Color Green
-global dir_stack;
-%determines number of times seen specific colors stops looping
-global color_counts;
-%if robot is searching maze or returning 
-%0 - returning
-%1 - searching for blue
-%2 - searching for green
+global last_seen;
 global searching;
+global color_counts;
 
-
-
-
-
-InitKeyboard;
-
-%reset car components to default vals
-brick.ResetMotorAngle('ABC');
-brick.SetColorMode(1,4);
-%brick.GyroCalibrate(2);
-%angle = brick.GyroAngle(2);
-%disp(angle);
-%angle = 0
-
-state = 0;
-last_seen =0;
+searching = 1;
+last_seen = 0;
 go = 1;
 remote = 0;
-dir_stack = [];
-%first val is for yellow, 2nd for blue, 3rd for green
 color_counts = [1,0,0];
-searching = 1;
 
-turn_counter = 0;
-reset_turn = 0;
 
-brick.beep();
-% main loop once exited car should stop all together
-while go
-    %loop for when car is not remote controlled
-    while remote == 0 
-        pause(0.05);
-        %CenterCar(brick);
-        brick.MoveMotor('AB', 20);
+
+
+
+
+a_s = 30; %motor A speed
+b_s = 30; %motor B speed
+
+InitKeyboard();
+
+brick.SetColorMode(1,4);
+
+while go 
+    while remote ==0 
+        brick.MoveMotor('A', b_s);
+        brick.MoveMotor('B',b_s);
+    
+        touch = brick.TouchPressed(4);
+        %color = brick.ColorCode(1);
+        dist = brick.UltrasonicDist(2);
+
         [red, green, blue] = GetColorValue(brick);
-        
         found_color = CheckColor(brick, red, green, blue);
 
         if found_color == 2
@@ -73,80 +43,116 @@ while go
             go = 0;
             break;
         end
-        
-        
-        
+
         last_seen = DoColorAction(brick, found_color, last_seen);
-        
-        %angle = brick.GyroAngle(2);
-        distance = brick.UltrasonicDist(2);
-        
-        %{
-            implement maze solving code
-        %}
-        touch = brick.TouchPressed(4);
-        %if touch sensor activated reverse and turn right
-        %otherwise keep moving forward
-        if touch 
-            brick.StopMotor('AB', 'Coast');
-            disp("touched Reverse and Turn")
-            Drive(brick, 'AB', 1, -40, 'Coast');
-            TurnNinety(brick, 0, 90);
-       % else
-       %     disp("no Touch driving fzorward")
-       %     Drive(brick, 'AB', 1, 30, 'Coast')z;
-        end
-
-        %if opening on the left turn left 
-        if distance > 50 && turn_counter == 0
-            brick.StopMotor('AB', 'Coast');
-            disp("Opening on Left turning")
-            Drive(brick,'AB',0.5,30,'Coast');
-            turn_counter = turn_counter + 1;
-            reset_turn = 0;
-            TurnNinety(brick, 1, 90);
-        elseif distance > 70 && turn_counter ~= 0
-            disp("Just turned")
-            reset_turn = reset_turn +1;
-            if reset_turn >= 10
-                turn_counter= 0;
-            end
-        end
-        
-
-
-        
-        if key == 'q'
+%{
+        disp(color);
+        if color ==5
+            brick.beep();
+            brick.StopMotor('AB', 'Brake');
+            pause(1);
+            brick.MoveMotor('A', a_s);
+            brick.MoveMotor('B', a_s);
+            pause(0.5);
+        elseif color == 2 || color == 3
+            disp("blue or green");
+            brick.StopMotor('AB', 'Brake');
             remote = 1;
+            
         end
-        if key == 'z'
-            go = 0;
-            brick.StopMotor('AB', 'Coast')
-            break;
+%}
+        
+
+        if dist > 50 
+            pause(0.75);
+            brick.StopMotor('AB', 'Brake');
+            brick.MoveMotor('A', -20);
+            TurnNinety(brick,1, 30);
+            brick.MoveMotor('A',a_s);
+            brick.MoveMotor('B', b_s);
+            pause(2);
+        end
+
+        if touch %if touch sensor activated
+            pause(1);
+            brick.StopMotor('AB','Brake');
+            %dist = brick.UltrasonicDist(2);
+            brick.MoveMotor('A', -1 * a_s);
+            brick.MoveMotor('B', -1* b_s);
+            pause(3.0); %move backwards from wall
+            brick.StopMotor('AB', 'Brake');
+            %Turn right if wall
+            brick.MoveMotor('A', -25);
+            brick.MoveMotor('B', 25);
+            pause(1.32)
+            brick.StopMotor('AB', 'Brake');
+            
+            if distance < 50 % if no wall on left
+                %TurnNinety(brick,0, 30);
+                
+                brick.MoveMotor('B', -18.5);
+                brick.StopMotor('B', 'Brake');
+                brick.MoveMotor('A', a_s);
+                brick.MoveMotor('B', b_s);
+                
+                pause(2);
+            else
+                %TurnNinety(brick,1,30);
+                
+                brick.MoveMotor('A', -18.5);
+                brick.StopMotor('A', 'Brake');
+                brick.MoveMotor('B', b_s);
+                brick.MoveMotor('A', a_s);
+                
+                pause(2);
+            end
+            
         end
 
     end
-    %loop for when car in remote control
-    while remote
-        pause(0.05)
-     
-        switch key 
+    while remote == 1
+        
+        pause(0.1);
+        switch key
             case 'uparrow'
-                Drive(brick, 'AB', 1, 30, 'Coast')
+            %Drive(brick,'AB',0.5, 25,'Coast');
+            brick.MoveMotor('A',20);
+            brick.MoveMotor('B',20);
             case 'downarrow'
-                Drive(brick, 'AB', 1, -30, 'Coast')
+                %Drive(brick,'AB',0.5, -25,'Coast');
+                brick.MoveMotor('A', -20);
+                brick.MoveMotor('B', -20);
             case 'leftarrow'
-                TurnLeft(brick, 30, 90);
+                %TurnLeft(brick, 40, 90);
+                brick.MoveMotor('A', -20);
+                brick.MoveMotor('B', 20);
+                %disp("LEFT ARROW PRESSED")
             case 'rightarrow'
-                TurnRight(brick,30 ,90);
+                %TurnRight(brick, 40, 90);
+                brick.MoveMotor('A', 20);
+                brick.MoveMotor('B', -20);
             case 'w'
-                Drive(brick, 'AB', 0.5, 20, 'Coast');
+                Drive(brick, 'AB', 0.5, 15, 'Coast');
             case 's'
-                Drive(brick, 'AB', 0.5, -20, 'Coast');
+                Drive(brick, 'AB', 0.5,-15, 'Coast');
             case 'a'
-                TurnLeft(brick, 30 ,30);
+        %        TurnLeft(brick, 40, 50);
+                brick.MoveMotor('A', 25);
+                brick.MoveMotor('B', -25);
+                pause(1.32)
+                brick.StopMotor('AB', 'Brake');
             case 'd'
-                TurnRight(brick, 30 ,30);
+                %TurnRight(brick,40,50);
+                %%brick.MoveMotor('B', -18.5);
+                %brick.StopMotor('B', 'Brake');
+                %brick.MoveMotor('A', 20);
+                %brick.MoveMotor('B', 20);
+                brick.MoveMotor('A', -25);
+                brick.MoveMotor('B', 25);
+                pause(1.32);
+                brick.StopMotor('AB', 'Brake');
+            case 'z'
+                brick.StopMotor('AB', 'Brake');
             case 'p'
                 MoveLift(brick, 10); 
             case 'o'
@@ -159,30 +165,13 @@ while go
                 remote = 0;
             case 'k'
                 go = 0;
-                brick.StopMotor('AB', 'Coast')
+                brick.StopMotor('AB', 'Brake');
                 break;
         end
-
     end
 
+end 
 
-end
-
-CloseKeyboard();
-
-%{
-car functions
-Drive, Turn Left, Turn Right, Turn Ninety, Color Sensing, Change car mode
-%}
-
-function Drive(brick, motors, time, speed, stop)
-    global last_seen
-    %disp('Function Run')
-    brick.MoveMotor(motors, speed);
-    pause(time);
-    brick.StopMotor(motors, 'Coast');
-    brick.ResetMotorAngle('AB')
-end
 
 
 function TurnLeft(brick, speed, angle)
@@ -247,7 +236,7 @@ end
 
 function previous = DoColorAction(brick, current_color,previous_color)
     global searching;
-    
+    global remote;
 
     if current_color == 1 && previous_color ~= 1 
         brick.StopMotor('AB');
@@ -257,8 +246,10 @@ function previous = DoColorAction(brick, current_color,previous_color)
         brick.beep();
         brick.beep();
         searching = 2;
+        remote = 1;
     elseif current_color == 3 && previous_color ~= 3
         brick.StopMotor('AB', 'Brake');
+        %{
         Drive(brick, 'AB', 1, 30, 'Coast');
         pause(0.5)
         MoveLift(brick, 15);
@@ -268,12 +259,16 @@ function previous = DoColorAction(brick, current_color,previous_color)
         MoveLift(brick,-15);
         TurnNinety(brick, 0,50);
         TurnNinety(brick, 0,50);
+        %}
+        remote = 1;
         searching = 0;
     elseif current_color == 4 && previous_color ~= 4 && searching == 0
         mode = ChangeMode(0);
     end
     previous = current_color;
 end 
+
+CloseKeyboard();
 %{
 function CenterCar(brick)
     angle = brick.GyroAngle(2);
@@ -333,6 +328,3 @@ function car_mode = ChangeMode(mode_number)
     car_mode = mode_number
 end
 
-function SolveMaze(brick)
-    
-end

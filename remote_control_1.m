@@ -1,5 +1,5 @@
 global key;
-InitKeyboard;
+InitKeyboard();
 
 brick.ResetMotorAngle('AB');
 
@@ -7,30 +7,53 @@ while 1
     pause(0.1)
     switch key
         case 'uparrow'
-            Drive(brick,'AB',0.5, 25,'Coast');
+            %Drive(brick,'AB',0.5, 25,'Coast');
+            brick.MoveMotor('A',20);
+            brick.MoveMotor('B',20);
         case 'downarrow'
-            Drive(brick,'AB',0.5, -25,'Coast');
+            %Drive(brick,'AB',0.5, -25,'Coast');
+            brick.MoveMotor('A', -20);
+            brick.MoveMotor('B', -20);
         case 'leftarrow'
-            TurnLeft(brick, 40, 90);
+            %TurnLeft(brick, 40, 90);
+            brick.MoveMotor('A', -25);
+            brick.MoveMotor('B', 25);
             %disp("LEFT ARROW PRESSED")
         case 'rightarrow'
-            TurnRight(brick, 40, 90);
+            %TurnRight(brick, 40, 90);
+            brick.MoveMotor('A', 25);
+            brick.MoveMotor('B', -25);
         case 'w'
             Drive(brick, 'AB', 0.5, 15, 'Coast');
         case 's'
             Drive(brick, 'AB', 0.5,-15, 'Coast');
         case 'a'
-            TurnLeft(brick, 40, 50);
+    %        TurnLeft(brick, 40, 50);
+            brick.MoveMotor('A', 25);
+            brick.MoveMotor('B', -25);
+            pause(1.32)
+            brick.StopMotor('AB', 'Brake');
         case 'd'
-            TurnRight(brick,40,50);
+            %TurnRight(brick,40,50);
+            %%brick.MoveMotor('B', -18.5);
+            %brick.StopMotor('B', 'Brake');
+            %brick.MoveMotor('A', 20);
+            %brick.MoveMotor('B', 20);
+            brick.MoveMotor('A', -25);
+            brick.MoveMotor('B', 25);
+            pause(1.32);
+            brick.StopMotor('AB', 'Brake');
         case 'p'
             MoveLift(brick, 10);
         case 'o'
             MoveLift(brick, -10);
-        case 0 
-            disp('none pressed');
         case 'q'
             break;
+        case 'z'
+            brick.StopMotor('AB', 'Brake');
+        case 0 
+            disp('none pressed');
+        
     end
 end
 CloseKeyboard();
