@@ -4,20 +4,23 @@ global key;
 global last_seen;
 global searching;
 global color_counts;
+global last_dist; 
 
 searching = 1;
 last_seen = 0;
 go = 1;
 remote = 0;
 color_counts = [1,0,0];
+last_dist =0;
+
+global dist_counter;
+dist_counter= 0;
 
 
 
 
-
-
-a_s = 30; %motor A speed
-b_s = 30; %motor B speed
+a_s = 40; %motor A speed
+b_s = 40; %motor B speed
 
 InitKeyboard();
 
@@ -31,6 +34,22 @@ while go
         touch = brick.TouchPressed(4);
         %color = brick.ColorCode(1);
         dist = brick.UltrasonicDist(2);
+        %{
+        if last_dist == dist 
+            dist_counter = dist_counter +1;
+        end
+        if dist_counter == 50
+            brick.MoveMotor('A', -1 * a_s);
+            brick.MoveMotor('B', -1*b_s);
+            pause(1);
+            brick.StopMotor('AB', 'Brake');
+            brick.MoveMotor('A', -25);
+            brick.MoveMotor('B', 25);
+            pause(1.32)
+            brick.StopMotor('AB', 'Brake');
+            dist_counter = 0;
+        end
+        %}
 
         [red, green, blue] = GetColorValue(brick);
         found_color = CheckColor(brick, red, green, blue);
@@ -67,7 +86,11 @@ while go
             pause(0.75);
             brick.StopMotor('AB', 'Brake');
             brick.MoveMotor('A', -20);
-            TurnNinety(brick,1, 30);
+            %TurnNinety(brick,1, 30);
+            brick.MoveMotor('A', -18.5);
+            brick.StopMotor('A', 'Brake');
+            brick.MoveMotor('B', b_s);
+            brick.MoveMotor('A', a_s);
             brick.MoveMotor('A',a_s);
             brick.MoveMotor('B', b_s);
             pause(2);
@@ -79,15 +102,15 @@ while go
             %dist = brick.UltrasonicDist(2);
             brick.MoveMotor('A', -1 * a_s);
             brick.MoveMotor('B', -1* b_s);
-            pause(3.0); %move backwards from wall
+            pause(1.25); %move backwards from wall
             brick.StopMotor('AB', 'Brake');
             %Turn right if wall
             brick.MoveMotor('A', -25);
             brick.MoveMotor('B', 25);
-            pause(1.32)
+            pause(1.4)
             brick.StopMotor('AB', 'Brake');
             
-            if distance < 50 % if no wall on left
+            if dist < 50 % if no wall on left
                 %TurnNinety(brick,0, 30);
                 
                 brick.MoveMotor('B', -18.5);
@@ -108,7 +131,7 @@ while go
             end
             
         end
-
+        last_dist = dist;
     end
     while remote == 1
         
