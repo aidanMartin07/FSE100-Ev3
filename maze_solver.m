@@ -1,17 +1,23 @@
+%This if the file that runs for the demonstration 
+
 global go; % 1 if car loop running
 global remote; %1 if car is remote controlled
 global key;
 global last_seen;
 global searching;
 global color_counts;
-global last_dist; 
+%0 = can recorrect
+%1 = cannot recorrect
+global state;
+%global last_dist; 
 
 searching = 1;
 last_seen = 0;
 go = 1;
 remote = 0;
 color_counts = [1,0,0];
-last_dist =0;
+%last_dist =0;
+state =0;
 
 global dist_counter;
 dist_counter= 0;
@@ -25,15 +31,28 @@ b_s = 40; %motor B speed
 InitKeyboard();
 
 brick.SetColorMode(1,4);
+%brick.GyroCalibrate(3);
 
 while go 
     while remote ==0 
         brick.MoveMotor('A', b_s);
         brick.MoveMotor('B',b_s);
+        state = 0;
     
         touch = brick.TouchPressed(4);
         %color = brick.ColorCode(1);
         dist = brick.UltrasonicDist(2);
+        %angle = brick.GyroAngle(3);
+        %disp(angle);
+        
+        %{
+        if state == 0
+            disp("check realign")
+            Realign(brick);
+            
+        end
+        %}
+        
         %{
         if last_dist == dist 
             dist_counter = dist_counter +1;
@@ -56,10 +75,12 @@ while go
 
         if found_color == 2
             remote = 1;
+            state = 1;
         end
 
         if found_color == 4 && searching == 0
             go = 0;
+            state = 1;
             break;
         end
 
@@ -83,21 +104,34 @@ while go
         
 
         if dist > 50 
-            pause(0.75);
+            state = 1;
+            pause(0.25);
             brick.StopMotor('AB', 'Brake');
+            brick.MoveMotor('A', 30);
+            brick.MoveMotor('B', -30);
+            pause(1.7);
+            brick.StopMotor('AB', 'Brake');
+            brick.MoveMotor('A',a_s);
+            brick.MoveMotor('B',b_s);
+            pause(2.5);
+            brick.StopMotor('AB', "Brake");
+            %{
             brick.MoveMotor('A', -20);
             %TurnNinety(brick,1, 30);
             brick.MoveMotor('A', -18.5);
+           
             brick.StopMotor('A', 'Brake');
             brick.MoveMotor('B', b_s);
             brick.MoveMotor('A', a_s);
             brick.MoveMotor('A',a_s);
             brick.MoveMotor('B', b_s);
             pause(2);
+            %}
         end
 
         if touch %if touch sensor activated
-            pause(1);
+            state = 1;
+            %pause(1);
             brick.StopMotor('AB','Brake');
             %dist = brick.UltrasonicDist(2);
             brick.MoveMotor('A', -1 * a_s);
@@ -105,20 +139,27 @@ while go
             pause(1.25); %move backwards from wall
             brick.StopMotor('AB', 'Brake');
             %Turn right if wall
-            brick.MoveMotor('A', -25);
-            brick.MoveMotor('B', 25);
-            pause(1.4)
+            brick.MoveMotor('A', -30);
+            brick.MoveMotor('B', 30);
+            pause(2);
             brick.StopMotor('AB', 'Brake');
-            
+            %{
             if dist < 50 % if no wall on left
                 %TurnNinety(brick,0, 30);
+                brick.MoveMotor('A', 30);
+                brick.MoveMotor('B', -30);
+                pause(2);
+                brick.StopMotor('AB', 'Brake');
                 
+
                 brick.MoveMotor('B', -18.5);
                 brick.StopMotor('B', 'Brake');
                 brick.MoveMotor('A', a_s);
                 brick.MoveMotor('B', b_s);
+
                 
                 pause(2);
+                
             else
                 %TurnNinety(brick,1,30);
                 
@@ -128,10 +169,12 @@ while go
                 brick.MoveMotor('A', a_s);
                 
                 pause(2);
+                
             end
+            %}
             
         end
-        last_dist = dist;
+        %last_dist = dist;
     end
     while remote == 1
         
@@ -260,6 +303,7 @@ end
 function previous = DoColorAction(brick, current_color,previous_color)
     global searching;
     global remote;
+    global go;
 
     if current_color == 1 && previous_color ~= 1 
         brick.StopMotor('AB');
@@ -286,7 +330,7 @@ function previous = DoColorAction(brick, current_color,previous_color)
         remote = 1;
         searching = 0;
     elseif current_color == 4 && previous_color ~= 4 && searching == 0
-        mode = ChangeMode(0);
+        go = 0;
     end
     previous = current_color;
 end 
@@ -346,6 +390,33 @@ function TurnNinety(brick, dir, speed)
     %disp(angle)
     %brick.GyroCalibrate(2);
 end
+
+function Realign(brick)
+    global state;
+    angle = brick.GyroAngle(3);
+    %disp(angle);
+    if isnan(angle)
+        disp(angle);
+        angle = 0;
+    end
+    if state ==0
+        brick.StopMotor('AB', 'Brake');
+        if angle > 25
+            brick.MoveMotor('A', 20);
+            brick.MoveMotor('B', -20);
+            pause(0.3);
+            brick.StopMotor('AB', 'Brake');
+        end
+        if angle < -25
+            brick.MoveMotor('A', -20);
+            brick.MoveMotor('B', 20);
+            pause(0.3);
+            brick.StopMotor('AB','Brake');
+        end
+    end
+    brick.GyroCalibrate(3);
+end
+
 
 function car_mode = ChangeMode(mode_number)
     car_mode = mode_number
